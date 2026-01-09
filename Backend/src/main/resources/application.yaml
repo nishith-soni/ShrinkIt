@@ -15,5 +15,5 @@ spring:
         ddl-auto: update
 
 jwt:
-  secret: b75f099c71bcf94f
+  secret: GjR3bDdAbPnwM7Gs1gH8vFoyq3EcfGeXLxnN6bxNpeinHOg1GtGTERQoq9PLUUZ9
   expiration: 172800000 # 20 days in milliseconds

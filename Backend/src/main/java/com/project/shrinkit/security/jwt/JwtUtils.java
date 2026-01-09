@@ -32,7 +32,7 @@ public class JwtUtils {
         return null;
     }
 
-    private String generateToken(UserDetailsImpl userDetails) {
+    public String generateToken(UserDetailsImpl userDetails) {
         String username = userDetails.getUsername();
         String roles = userDetails.getAuthorities().stream()
                 .map(authority -> authority.getAuthority())

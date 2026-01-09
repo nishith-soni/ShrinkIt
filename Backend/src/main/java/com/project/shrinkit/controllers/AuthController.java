@@ -1,5 +1,6 @@
 package com.project.shrinkit.controllers;
 
+import com.project.shrinkit.dtos.LoginRequest;
 import com.project.shrinkit.dtos.RegisterRequest;
 import com.project.shrinkit.models.User;
 import com.project.shrinkit.services.UserService;
@@ -16,6 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private UserService userService;
+
+    @PostMapping("/public/login")
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
+        return ResponseEntity.ok(userService.authenticateUser(loginRequest));
+    }
 
     @PostMapping("/public/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
