@@ -1,10 +1,12 @@
 import React, { use, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import TextField from './TextField';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import api from '../api/api';
+import { toast } from 'react-hot-toast';
 
 const RegisterPage = () => {
-
+    const navigate = useNavigate();
     const [loader, setLoader] = useState(false);
 
     const {
@@ -22,7 +24,21 @@ const RegisterPage = () => {
     });
 
     const registerHandler = async(data) => {
-        
+        setLoader(true);
+        try {
+            const { data: response } = await api.post(
+                "/api/auth/public/register",
+                data
+            );
+            reset();
+            navigate('/login');
+            toast.success("Registration Successful");
+        } catch (error) {
+            console.log("Registration Error: ", error);
+            toast.error("Registration Failed.");
+        } finally {
+            setLoader(false);
+        }
     }
 
     return (
