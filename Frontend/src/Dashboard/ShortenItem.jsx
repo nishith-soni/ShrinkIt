@@ -20,6 +20,20 @@ const subDomain = import.meta.env.VITE_REACT_SUBDOMAIN.replace(
   "",
 );
 
+// Helper function to format date as YYYY-MM-DD
+const formatDate = (date) => date.toISOString().split("T")[0];
+
+// Get default dates (current year)
+const getDefaultDates = () => {
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const endOfYear = new Date(now.getFullYear(), 11, 31);
+  return {
+    start: formatDate(startOfYear),
+    end: formatDate(endOfYear),
+  };
+};
+
 const ShortenItem = ({ originalUrl, shortUrl, clickCount, createdDate }) => {
   const { token } = useStoreContext();
   const navigate = useNavigate();
@@ -28,6 +42,9 @@ const ShortenItem = ({ originalUrl, shortUrl, clickCount, createdDate }) => {
   const [loader, setLoader] = useState(false);
   const [selectedUrl, setSelectedUrl] = useState("");
   const [analyticsData, setAnalyticsData] = useState([]);
+  const defaultDates = getDefaultDates();
+  const [startDate, setStartDate] = useState(defaultDates.start);
+  const [endDate, setEndDate] = useState(defaultDates.end);
 
   const analyticsHandler = (shortUrl) => {
     if (!analyticToggle) {
@@ -40,7 +57,7 @@ const ShortenItem = ({ originalUrl, shortUrl, clickCount, createdDate }) => {
     setLoader(true);
     try {
       const { data } = await api.get(
-        `/api/urls/analytics/${selectedUrl}?startDate=2024-12-01T00:00:00&endDate=2024-12-31T23:59:59`,
+        `/api/urls/analytics/${selectedUrl}?startDate=${startDate}T00:00:00&endDate=${endDate}T23:59:59`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -59,6 +76,13 @@ const ShortenItem = ({ originalUrl, shortUrl, clickCount, createdDate }) => {
       setLoader(false);
     }
   };
+
+  // Refetch when dates change and analytics is open
+  useEffect(() => {
+    if (analyticToggle && shortUrl) {
+      setSelectedUrl(shortUrl);
+    }
+  }, [startDate, endDate]);
 
   useEffect(() => {
     if (selectedUrl) {
@@ -137,9 +161,36 @@ const ShortenItem = ({ originalUrl, shortUrl, clickCount, createdDate }) => {
       <React.Fragment>
         <div
           className={`${
-            analyticToggle ? "flex" : "hidden"
-          }  max-h-96 sm:mt-0 mt-5 min-h-96 relative  border-t-1 w-[100%] overflow-hidden border-slate-300`}
+            analyticToggle ? "flex flex-col" : "hidden"
+          }  sm:mt-0 mt-5 relative  border-t-1 w-[100%] overflow-hidden border-slate-300`}
         >
+          <div className="flex flex-wrap gap-4 py-4 items-center justify-center sm:justify-start">
+            <div className="flex items-center gap-2">
+              <label htmlFor={`startDate-${shortUrl}`} className="text-slate-700 font-medium text-sm">
+                From:
+              </label>
+              <input
+                type="date"
+                id={`startDate-${shortUrl}`}
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label htmlFor={`endDate-${shortUrl}`} className="text-slate-700 font-medium text-sm">
+                To:
+              </label>
+              <input
+                type="date"
+                id={`endDate-${shortUrl}`}
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+          <div className="max-h-96 min-h-96 relative w-full">
           {loader ? (
             <div className="min-h-[calc(450px-140px)] flex justify-center items-center w-full">
               <div className="flex flex-col items-center gap-1">
@@ -171,6 +222,7 @@ const ShortenItem = ({ originalUrl, shortUrl, clickCount, createdDate }) => {
               <Graph graphData={analyticsData} />
             </>
           )}
+          </div>
         </div>
       </React.Fragment>
     </div>

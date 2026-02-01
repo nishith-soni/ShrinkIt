@@ -1,15 +1,33 @@
 import { useState } from "react";
 import Graph from "./Graph.jsx";
 import { useStoreContext } from "../contextApi/ContextApi.jsx";
-import { useFetchTotalClicks } from "../hooks/useQuery.js";
+import { useFetchTotalClicks, useFetchMyShortUrls } from "../hooks/useQuery.js";
 import ShortenPopUp from "./ShortenPopUp.jsx";
-import { useFetchMyShortUrls } from "../hooks/useQuery.js";
 import ShortenUrlList from "./ShortenUrlList.jsx";
+import { FaLink } from "react-icons/fa";
+
+// Helper function to format date as YYYY-MM-DD
+const formatDate = (date) => date.toISOString().split("T")[0];
+
+// Get default dates (current year)
+const getDefaultDates = () => {
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const endOfYear = new Date(now.getFullYear(), 11, 31);
+  return {
+    start: formatDate(startOfYear),
+    end: formatDate(endOfYear),
+  };
+};
 
 const DashboardLayout = () => {
   // const refetch = false;
   const { token } = useStoreContext();
   const [shortenPopUp, setShortenPopUp] = useState(false);
+  const defaultDates = getDefaultDates();
+  const [startDate, setStartDate] = useState(defaultDates.start);
+  const [endDate, setEndDate] = useState(defaultDates.end);
+
   const {
     isLoading,
     data: myShortenUrls,
@@ -17,6 +35,8 @@ const DashboardLayout = () => {
   } = useFetchMyShortUrls(token, onError);
   const { isLoading: loader, data: totalClicks } = useFetchTotalClicks(
     token,
+    startDate,
+    endDate,
     onError,
   );
   function onError() {
@@ -28,6 +48,32 @@ const DashboardLayout = () => {
         <p>Loading....</p>
       ) : (
         <div className="lg:w-[90%] w-full mx-auto py-16">
+          <div className="flex flex-wrap gap-4 mb-4 items-center justify-center sm:justify-start">
+            <div className="flex items-center gap-2">
+              <label htmlFor="startDate" className="text-slate-700 font-medium">
+                From:
+              </label>
+              <input
+                type="date"
+                id="startDate"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label htmlFor="endDate" className="text-slate-700 font-medium">
+                To:
+              </label>
+              <input
+                type="date"
+                id="endDate"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
           <div className=" h-96 relative ">
             {totalClicks.length === 0 && (
               <div className="absolute flex flex-col  justify-center sm:items-center items-end  w-full left-0 top-0 bottom-0 right-0 m-auto">
