@@ -5,6 +5,8 @@ import { useFetchTotalClicks, useFetchMyShortUrls } from "../hooks/useQuery.js";
 import ShortenPopUp from "./ShortenPopUp.jsx";
 import ShortenUrlList from "./ShortenUrlList.jsx";
 import { FaLink } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom'
+import Loader from "../components/Loader.jsx";
 
 // Helper function to format date as YYYY-MM-DD
 const formatDate = (date) => date.toISOString().split("T")[0];
@@ -23,6 +25,7 @@ const getDefaultDates = () => {
 const DashboardLayout = () => {
   // const refetch = false;
   const { token } = useStoreContext();
+  const navigate = useNavigate();
   const [shortenPopUp, setShortenPopUp] = useState(false);
   const defaultDates = getDefaultDates();
   const [startDate, setStartDate] = useState(defaultDates.start);
@@ -40,12 +43,12 @@ const DashboardLayout = () => {
     onError,
   );
   function onError() {
-    console.log("ERROR");
+    navigate('/error');
   }
   return (
     <div className="lg:px-14 sm:px-8 px-4 min-h-[calc(100vh-64px)]">
       {loader ? (
-        <p>Loading....</p>
+        <Loader />
       ) : (
         <div className="lg:w-[90%] w-full mx-auto py-16">
           <div className="flex flex-wrap gap-4 mb-4 items-center justify-center sm:justify-start">
