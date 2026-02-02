@@ -1,22 +1,22 @@
 spring:
   application:
-    name: shrinkit
+    name: ${APPLICATION_NAME}
 
   datasource:
-    url: jdbc:mysql://localhost:3306/shrinkitdb
-    username: root
-    password: password
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
 
   jpa:
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+        dialect: ${DATABASE_DIALECT}
     hibernate:
-        ddl-auto: update
+        ddl-auto: ${HIBERNATE_DDL_AUTO}
 
 jwt:
-  secret: GjR3bDdAbPnwM7Gs1gH8vFoyq3EcfGeXLxnN6bxNpeinHOg1GtGTERQoq9PLUUZ9
-  expiration: 172800000 # 20 days in milliseconds
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION_MS}
 
 frontend:
-  url: http://localhost:5173
+  url: ${FRONTEND_URL}
